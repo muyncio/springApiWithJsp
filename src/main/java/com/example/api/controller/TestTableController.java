@@ -3,6 +3,7 @@ package com.example.api.controller;
 import com.example.api.database.utils.HibernateFactory;
 import com.example.api.model.TestTable;
 import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Controller;
@@ -63,11 +64,12 @@ public class TestTableController {
 
         try {
             tx = session.beginTransaction();
-            List values = session.createQuery("select t2.id, t2.kolumna1, t2.kolumna2, t2.kolumna3, t2.kolumna4 from TestTable t1\n" +
-                    "join TestTable t2 on t2.kolumna1 not in (t1.kolumna1, t1.kolumna2, t1.kolumna3) \n" +
-                    "and t2.kolumna2 not in (t1.kolumna1, t1.kolumna2, t1.kolumna3) \n" +
-                    "and t2.kolumna3 not in (t1.kolumna1, t1.kolumna2, t1.kolumna3) \n" +
-                    "where t1.id = 1").list();
+
+            List values = session.createQuery("from TestTable where \n" +
+                    "kolumna1 not in (select kolumna1 from TestTable where id = 1) \n" +
+                    "and kolumna2 not in (select kolumna2 from TestTable where id = 1) \n" +
+                    "and kolumna3 not in (select kolumna3 from TestTable where id = 1) \n" +
+                    "and kolumna4 not in (select kolumna4 from TestTable where id = 1)").list();
             for (Iterator iterator = values.iterator(); iterator.hasNext();){
                 TestTable testTable = (TestTable) iterator.next();
                 htmlList.add("<tr> " +
@@ -100,11 +102,11 @@ public class TestTableController {
 
         try {
             tx = session.beginTransaction();
-            List values = session.createQuery("select t2.id, t2.kolumna1, t2.kolumna2, t2.kolumna3, t2.kolumna4 from TestTable t1\n" +
-                    "join TestTable t2 on t2.kolumna1 in (t1.kolumna1, t1.kolumna2, t1.kolumna3) \n" +
-                    "and t2.kolumna2 in (t1.kolumna1, t1.kolumna2, t1.kolumna3) \n" +
-                    "and t2.kolumna3 in (t1.kolumna1, t1.kolumna2, t1.kolumna3) \n" +
-                    "where t1.id = 1").list();
+            List values = session.createQuery("from TestTable where \n" +
+                    "kolumna1 in (select kolumna1 from TestTable where id = 1) \n" +
+                    "or kolumna2 in (select kolumna2 from TestTable where id = 1) \n" +
+                    "or kolumna3 in (select kolumna3 from TestTable where id = 1) \n" +
+                    "or kolumna4 in (select kolumna4 from TestTable where id = 1)").list();
             for (Iterator iterator = values.iterator(); iterator.hasNext();){
                 TestTable testTable = (TestTable) iterator.next();
                 htmlList.add("<tr> " +
